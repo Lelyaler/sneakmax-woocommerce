@@ -2363,7 +2363,7 @@
   background-color: var(--color-accent-hover);
 }
 .product__btn:first-child {
-  margin-right: var(--main-offset);
+  margin-right: 0;
 }
 .product__btn--disabled {
   opacity: 0.4;

@@ -9,7 +9,7 @@ if ( ! defined( 'ABSPATH' ) ) {
 	exit;
 }
 
-define( 'SNEAKMAX_VERSION', '1.0.1' );
+define( 'SNEAKMAX_VERSION', '1.0.2' );
 
 /**
  * Theme setup
@@ -241,41 +241,45 @@ function sneakmax_render_product_card( $product ) {
 				/>
 				<div class="product__btns">
 					<button
-						class="btn-reset product__btn"
+						class="btn-reset product__btn product__btn--view"
 						data-graph-path="prod-modal"
 						data-id="<?php echo esc_attr( $pid ); ?>"
+						data-tooltip="<?php esc_attr_e( 'Просмотр', 'sneakmax' ); ?>"
 						aria-label="<?php echo esc_attr( sprintf( __( 'Показать информацию о товаре %s', 'sneakmax' ), $title ) ); ?>"
 						title="<?php esc_attr_e( 'Быстрый просмотр', 'sneakmax' ); ?>"
 					>
-						<svg>
-							<use xlink:href="<?php echo esc_url( $sprite_url . '#eye' ); ?>"></use>
+						<svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+							<path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"></path>
+							<circle cx="12" cy="12" r="3"></circle>
 						</svg>
 					</button>
 
 					<button
-						class="btn-reset product__btn add-to-cart-btn ajax_add_to_cart add_to_cart_button"
+						class="btn-reset product__btn product__btn--cart add-to-cart-btn ajax_add_to_cart add_to_cart_button"
 						data-id="<?php echo esc_attr( $pid ); ?>"
 						data-product_id="<?php echo esc_attr( $pid ); ?>"
 						data-quantity="1"
+						data-tooltip="<?php esc_attr_e( 'В корзину', 'sneakmax' ); ?>"
 						aria-label="<?php echo esc_attr( sprintf( __( 'Добавить в корзину: %s', 'sneakmax' ), $title ) ); ?>"
 						title="<?php esc_attr_e( 'В корзину', 'sneakmax' ); ?>"
 					>
-						<svg>
-							<use xlink:href="<?php echo esc_url( $sprite_url . '#cart' ); ?>"></use>
+						<svg width="19" height="18" viewBox="0 0 20 19" fill="currentColor">
+							<path d="M20 6.579h-3.396L13.036.319a.608.608 0 00-.858-.225.678.678 0 00-.214.902l3.182 5.583H4.854L8.036.996a.678.678 0 00-.214-.902.608.608 0 00-.858.225L3.396 6.58H0v1.316h1.357l1.587 8.915c.166.934.941 1.611 1.844 1.611h10.424c.902 0 1.678-.677 1.843-1.61l1.588-8.916H20V6.579zm-4.174 9.99a.634.634 0 01-.614.536H4.788c-.301 0-.56-.225-.615-.537L2.628 7.895h14.744l-1.546 8.674z"/>
 						</svg>
 					</button>
 
 					<button
-						class="btn-reset product__btn wfcd-quick-buy-btn"
+						class="btn-reset product__btn product__btn--quick wfcd-quick-buy-btn"
 						data-product_id="<?php echo esc_attr( $pid ); ?>"
 						data-product-name="<?php echo esc_attr( $title ); ?>"
 						data-product-price="<?php echo esc_attr( number_format( (float) $price, 0, '', ' ' ) . ' ₽' ); ?>"
 						data-product-thumb="<?php echo esc_attr( '<img src="' . esc_url( $image_url ) . '" alt="" />' ); ?>"
+						data-tooltip="<?php esc_attr_e( 'В 1 клик', 'sneakmax' ); ?>"
 						aria-label="<?php echo esc_attr( sprintf( __( 'Купить в 1 клик: %s', 'sneakmax' ), $title ) ); ?>"
 						title="<?php esc_attr_e( 'Купить в 1 клик', 'sneakmax' ); ?>"
 					>
-						<svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-							<polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2"></polygon>
+						<svg width="19" height="19" viewBox="0 0 24 24" fill="currentColor">
+							<path d="M13 2L3 14h9l-1 8 10-12h-9l1-8z"/>
 						</svg>
 					</button>
 				</div>

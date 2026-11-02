@@ -1,0 +1,201 @@
+/*
+Theme Name: Sneakmax
+Theme URI: https://github.com/Lelyaler/sneakmax-woocommerce
+Author: Elena Cherniavskaia
+Author URI: https://github.com/Lelyaler
+Description: Премиальная тема интернет-магазина оригинальных брендовых кроссовок с поддержкой WooCommerce, AJAX-каталогом, интерактивным квизом и быстрым оформлением заказов в 1 клик.
+Version: 1.0.1
+Requires at least: 6.0
+Tested up to: 6.6
+Requires PHP: 7.4
+License: GNU General Public License v2 or later
+License URI: http://www.gnu.org/licenses/gpl-2.0.html
+Text Domain: sneakmax
+Tags: e-commerce, custom-colors, custom-menu, featured-images, translation-ready, woocommerce
+*/
+
+/* Modern WordPress Admin Bar Adjustment */
+body.admin-bar .header.fix-block {
+  top: 32px;
+}
+@media (max-width: 782px) {
+  body.admin-bar .header.fix-block {
+    top: 46px;
+  }
+}
+
+/* Sticky Footer Layout */
+html,
+body {
+  height: 100%;
+  margin: 0;
+  padding: 0;
+}
+
+body {
+  display: flex;
+  flex-direction: column;
+  min-height: 100vh;
+}
+
+.site-container {
+  display: flex;
+  flex-direction: column;
+  min-height: 100vh;
+  width: 100%;
+  flex: 1 0 auto;
+}
+
+.main {
+  flex: 1 0 auto;
+  display: flex;
+  flex-direction: column;
+  width: 100%;
+}
+
+.footer {
+  margin-top: auto !important;
+  flex-shrink: 0;
+  width: 100%;
+}
+
+/* Page / WooCommerce Content Spacing for Fixed Header */
+.page-content-container,
+.sneakmax-woocommerce-container,
+body:not(.home) .main > .container {
+  padding-top: 130px !important;
+  padding-bottom: 80px !important;
+  flex: 1 0 auto;
+  width: 100%;
+  box-sizing: border-box;
+}
+
+/* Custom WooCommerce Overrides for Sneakmax Aesthetics */
+.product__btn--cart {
+  background-color: var(--accent-color, #f14f4f);
+  color: #fff;
+  border: none;
+  cursor: pointer;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  transition: background-color 0.2s ease, transform 0.15s ease;
+}
+
+.product__btn--cart:hover {
+  background-color: #d83d3d;
+  transform: translateY(-1px);
+}
+
+.product__btn--oneclick {
+  background-color: #444b54;
+  color: #fff;
+  border: none;
+  cursor: pointer;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  transition: background-color 0.2s ease, transform 0.15s ease;
+}
+
+.product__btn--oneclick:hover {
+  background-color: #2c3239;
+  transform: translateY(-1px);
+}
+
+.product__badges {
+  position: absolute;
+  top: 10px;
+  left: 10px;
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  z-index: 2;
+}
+
+.badge-sale {
+  background: #f14f4f;
+  color: #fff;
+  font-size: 11px;
+  font-weight: 700;
+  padding: 3px 8px;
+  border-radius: 3px;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+}
+
+.woocommerce-pagination {
+  margin-top: 30px;
+  text-align: center;
+}
+
+.woocommerce-pagination ul {
+  display: inline-flex;
+  gap: 8px;
+  list-style: none;
+  padding: 0;
+  margin: 0;
+}
+
+.woocommerce-pagination ul li .page-numbers {
+  display: inline-block;
+  padding: 8px 14px;
+  background: #fff;
+  border: 1px solid #e7e7e7;
+  color: #444b54;
+  text-decoration: none;
+  border-radius: 4px;
+  font-weight: 600;
+  transition: all 0.2s;
+}
+
+.woocommerce-pagination ul li .page-numbers.current,
+.woocommerce-pagination ul li .page-numbers:hover {
+  background: #f14f4f;
+  color: #fff;
+  border-color: #f14f4f;
+}
+
+/* WooCommerce Cart & Checkout Styling in Sneakmax Theme */
+.woocommerce-cart .entry-title,
+.woocommerce-checkout .entry-title {
+  font-family: var(--font-family, "Intro", sans-serif);
+  font-size: 32px;
+  font-weight: 700;
+  color: #2b313d;
+  margin-bottom: 24px;
+}
+
+.woocommerce table.shop_table {
+  border-radius: 8px;
+  overflow: hidden;
+  border-color: #ebebeb;
+}
+
+.woocommerce .cart-collaterals .cart_totals {
+  background: #fbfbfb;
+  padding: 24px;
+  border-radius: 8px;
+  border: 1px solid #ebebeb;
+}
+
+.woocommerce a.button.alt,
+.woocommerce button.button.alt,
+.woocommerce input.button.alt,
+.wc-block-components-checkout-place-order-button,
+.wc-block-cart__submit-button {
+  background-color: var(--color-accent, #d93232) !important;
+  color: #fff !important;
+  border-radius: 4px !important;
+  padding: 14px 28px !important;
+  font-weight: 700 !important;
+  transition: background-color 0.2s ease !important;
+}
+
+.woocommerce a.button.alt:hover,
+.woocommerce button.button.alt:hover,
+.woocommerce input.button.alt:hover,
+.wc-block-components-checkout-place-order-button:hover,
+.wc-block-cart__submit-button:hover {
+  background-color: var(--color-accent-hover, #ba2424) !important;
+}

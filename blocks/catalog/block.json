@@ -1,0 +1,28 @@
+{
+  "$schema": "https://schemas.wp.org/trunk/block.json",
+  "apiVersion": 3,
+  "name": "sneakmax/catalog",
+  "version": "1.0.0",
+  "title": "Sneakmax AJAX Catalog",
+  "category": "sneakmax-blocks",
+  "icon": "store",
+  "description": "Dynamic WooCommerce product catalog with AJAX price and attribute filters, quick view modal, and responsive grid.",
+  "keywords": [ "sneakmax", "catalog", "woocommerce", "products", "filter" ],
+  "textdomain": "sneakmax",
+  "supports": {
+    "html": false,
+    "align": [ "wide", "full" ]
+  },
+  "attributes": {
+    "title": {
+      "type": "string",
+      "default": "Каталог кроссовок"
+    },
+    "postsPerPage": {
+      "type": "number",
+      "default": 9
+    }
+  },
+  "editorScript": "sneakmax-editor-blocks",
+  "render": "file:./render.php"
+}

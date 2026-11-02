@@ -1,0 +1,28 @@
+{
+  "$schema": "https://schemas.wp.org/trunk/block.json",
+  "apiVersion": 3,
+  "name": "sneakmax/quiz",
+  "version": "1.0.0",
+  "title": "Sneakmax Sizing Quiz",
+  "category": "sneakmax-blocks",
+  "icon": "forms",
+  "description": "Interactive multi-step sneaker sizing quiz with type selection, size slider, and instant contact form.",
+  "keywords": [ "sneakmax", "quiz", "sneakers", "size", "form" ],
+  "textdomain": "sneakmax",
+  "supports": {
+    "html": false,
+    "align": [ "wide", "full" ]
+  },
+  "attributes": {
+    "title": {
+      "type": "string",
+      "default": "Мы подберем идеальную пару для вас"
+    },
+    "subtitle": {
+      "type": "string",
+      "default": "Ответьте на три вопроса и мы вышлем каталог с самыми подходящими для вас моделями"
+    }
+  },
+  "editorScript": "sneakmax-editor-blocks",
+  "render": "file:./render.php"
+}

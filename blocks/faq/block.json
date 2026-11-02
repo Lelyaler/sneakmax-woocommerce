@@ -1,0 +1,24 @@
+{
+  "$schema": "https://schemas.wp.org/trunk/block.json",
+  "apiVersion": 3,
+  "name": "sneakmax/faq",
+  "version": "1.0.0",
+  "title": "Sneakmax FAQ Accordion",
+  "category": "sneakmax-blocks",
+  "icon": "editor-help",
+  "description": "Accessible FAQ accordion block with animated questions and answers.",
+  "keywords": [ "sneakmax", "faq", "accordion", "questions" ],
+  "textdomain": "sneakmax",
+  "supports": {
+    "html": false,
+    "align": [ "wide", "full" ]
+  },
+  "attributes": {
+    "title": {
+      "type": "string",
+      "default": "Часто задаваемые вопросы"
+    }
+  },
+  "editorScript": "sneakmax-editor-blocks",
+  "render": "file:./render.php"
+}

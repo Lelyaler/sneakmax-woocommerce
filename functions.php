@@ -37,9 +37,6 @@ function sneakmax_setup() {
 		)
 	);
 
-	add_theme_support( 'align-wide' );
-	add_theme_support( 'responsive-embeds' );
-
 	register_nav_menus(
 		array(
 			'primary' => esc_html__( 'Главное меню', 'sneakmax' ),
@@ -48,46 +45,6 @@ function sneakmax_setup() {
 	);
 }
 add_action( 'after_setup_theme', 'sneakmax_setup' );
-
-/**
- * Register Gutenberg Block Category for Sneakmax Theme
- */
-function sneakmax_block_categories( $categories, $post ) {
-	array_unshift(
-		$categories,
-		array(
-			'slug'  => 'sneakmax-blocks',
-			'title' => esc_html__( 'Sneakmax Theme Blocks', 'sneakmax' ),
-			'icon'  => 'store',
-		)
-	);
-	return $categories;
-}
-add_filter( 'block_categories_all', 'sneakmax_block_categories', 10, 2 );
-
-/**
- * Register Sneakmax Theme Native Gutenberg Blocks
- */
-function sneakmax_register_theme_blocks() {
-	wp_register_script(
-		'sneakmax-editor-blocks',
-		get_template_directory_uri() . '/js/editor-blocks.js',
-		array( 'wp-blocks', 'wp-element', 'wp-block-editor', 'wp-components', 'wp-i18n' ),
-		SNEAKMAX_VERSION,
-		true
-	);
-
-	$theme_dir = get_template_directory();
-	$blocks    = array( 'quiz', 'catalog', 'faq' );
-
-	foreach ( $blocks as $block ) {
-		$block_path = $theme_dir . '/blocks/' . $block;
-		if ( file_exists( $block_path . '/block.json' ) ) {
-			register_block_type( $block_path );
-		}
-	}
-}
-add_action( 'init', 'sneakmax_register_theme_blocks' );
 
 /**
  * Declare HPOS compatibility

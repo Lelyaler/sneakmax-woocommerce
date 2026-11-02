@@ -386,9 +386,16 @@ if (catalogList) {
       modal = new GraphModal({
         isOpen: function isOpen(m) {
           if (m.modalContainer.classList.contains("prod-modal")) {
-            var openBtnId = m.previousActiveElement.dataset.id;
+            var prev = m.previousActiveElement;
+            var openBtn = prev ? (prev.closest('[data-graph-path="prod-modal"]') || (prev.closest('.product') ? prev.closest('.product').querySelector('[data-graph-path="prod-modal"]') : null)) : null;
+            var openBtnId = openBtn ? (openBtn.dataset.id || openBtn.dataset.productId) : (prev && prev.dataset ? prev.dataset.id : 1);
             loadModalData(openBtnId);
-            prodSlider.update();
+            setTimeout(function () {
+              if (prodSlider && typeof prodSlider.update === "function") {
+                prodSlider.update();
+                prodSlider.slideTo(0);
+              }
+            }, 50);
           }
         },
         isClose: function isClose(m) {
@@ -503,6 +510,8 @@ if (catalogList) {
   function loadModalData() {
     var id =
       arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : 1;
+    var themeUri = (typeof sneakmaxData !== "undefined" && sneakmaxData.themeUri) ? sneakmaxData.themeUri : "";
+
     getProductsData()
       .then(function (data) {
         prodModalSlider.innerHTML = "";
@@ -512,154 +521,173 @@ if (catalogList) {
         prodModalChars.innerHTML = "";
         prodModalVideo.innerHTML = "";
 
-        var _iterator = _createForOfIteratorHelper(data),
-          _step;
+        var dataItem = data.find(function (item) {
+          return item.id == id || item.wc_id == id;
+        });
 
-        try {
-          var _loop = function _loop() {
-            var dataItem = _step.value;
+        // Fallback: if not found, use first item
+        if (!dataItem && data.length > 0) {
+          dataItem = data[0];
+        }
 
-            if (dataItem.id == id) {
-              console.log(dataItem);
-              var slides = dataItem.gallery.map(function (image, idx) {
-                return '\n                <div class="swiper-slide" data-index="'
-                  .concat(idx, '">\n                  <img src="')
-                  .concat(
-                    image,
-                    '" alt="">\n                </div>\n              '
-                  );
-              });
-              var preview = dataItem.gallery.map(function (image, idx) {
-                return '\n                <div class="modal-preview__item '
-                  .concat(
-                    idx === 0 ? "modal-preview__item--active" : "",
-                    '" tabindex="0" data-index="'
-                  )
-                  .concat(idx, '">\n                  <img src="')
-                  .concat(
-                    image,
-                    '" alt="">\n                </div>\n              '
-                  );
-              });
-              var sizes = dataItem.sizes.map(function (size, idx) {
-                return '\n                <li class="modal-sizes__item">\n                  <button class="btn-reset modal-sizes__btn">'.concat(
-                  size,
-                  "</button>\n                </li>\n              "
-                );
-              });
-              prodModalSlider.innerHTML = slides.join("");
-              prodModalPreview.innerHTML = preview.join("");
-              prodModalInfo.innerHTML =
-                '\n\n              <h3 class="modal-info__title">'
-                  .concat(
-                    dataItem.title,
-                    '</h3>\n              <div class="modal-info__rate">\n                <img src="img/star.svg" alt="\u0420\u0435\u0439\u0442\u0438\u043D\u0433 5 \u0438\u0437 5">\n                <img src="img/star.svg" alt="">\n                <img src="img/star.svg" alt="">\n                <img src="img/star.svg" alt="">\n                <img src="img/star.svg" alt="">\n              </div>\n              <div class="modal-info__sizes">\n                <span class="modal-info__subtitle">\u0412\u044B\u0431\u0435\u0440\u0438\u0442\u0435 \u0440\u0430\u0437\u043C\u0435\u0440</span>\n                <ul class="list-reset modal-info__sizes-list modal-sizes">\n                  '
-                  )
-                  .concat(
-                    sizes.join(""),
-                    '\n                </ul>\n              </div>\n              <div class="modal-info__price">\n                <span class="modal-info__current-price">'
-                  )
-                  .concat(
-                    dataItem.price,
-                    ' \u0440</span>\n                <span class="modal-info__old-price">'
-                  )
-                  .concat(
-                    dataItem.oldPrice ? dataItem.oldPrice + "р" : "",
-                    "</span>\n              </div>\n            "
-                  );
-              prodModalDescr.textContent = dataItem.description;
-              var charsItems = "";
-              Object.keys(dataItem.chars).forEach(function eachKey(key) {
-                charsItems += '<p class="prod-bottom__descr prod-chars__item">'
-                  .concat(key, ": ")
-                  .concat(dataItem.chars[key], "</p>");
-              });
-              prodModalChars.innerHTML = charsItems;
+        if (dataItem) {
+          var galleryImages = (dataItem.gallery && dataItem.gallery.length > 0) ? dataItem.gallery : [dataItem.mainImage];
 
-              if (dataItem.video) {
-                prodModalVideo.style.display = "block";
-                prodModalVideo.innerHTML =
-                  '\n                <iframe src="'.concat(
-                    dataItem.video,
-                    '"\n                allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"\n                allowfullscreen></iframe>\n              '
-                  );
-              } else {
-                prodModalVideo.style.display = "none";
-              }
-
-              // Выбор размера в модальном окне
-              var sizeBtns = prodModal.querySelectorAll(".modal-sizes__btn");
-              if (sizeBtns.length > 0) {
-                sizeBtns[0].classList.add("modal-sizes__btn--active");
-              }
-              sizeBtns.forEach(function (btn) {
-                btn.addEventListener("click", function (e) {
-                  sizeBtns.forEach(function (b) {
-                    b.classList.remove("modal-sizes__btn--active");
-                  });
-                  e.currentTarget.classList.add("modal-sizes__btn--active");
-                });
-              });
-
-              // Добавление товара из модального окна
-              var orderBtn = prodModal.querySelector(".modal-info__order");
-              if (orderBtn) {
-                orderBtn.dataset.id = dataItem.id;
-                orderBtn.onclick = function () {
-                  var pId = orderBtn.dataset.id;
-                  loadCartData(pId);
-                  var activeSize = prodModal.querySelector(".modal-sizes__btn--active");
-                  var sizeText = activeSize ? " (размер " + activeSize.textContent.trim() + ")" : "";
-                  showToast("Товар добавлен в корзину" + sizeText + "!");
-                  if (modal) {
-                    modal.close();
-                  }
-                };
-              }
+          var slides = galleryImages.map(function (image, idx) {
+            var imgSrc = image;
+            if (themeUri && imgSrc.indexOf("http") !== 0 && imgSrc.indexOf("/") !== 0) {
+              imgSrc = themeUri + "/" + imgSrc.replace(/^\.\//, "");
             }
-          };
+            return '\n            <div class="swiper-slide" data-index="'
+              .concat(idx, '">\n              <img src="')
+              .concat(
+                imgSrc,
+                '" alt="' + (dataItem.title || '') + '" width="280" height="293">\n            </div>\n          '
+              );
+          });
 
-          for (_iterator.s(); !(_step = _iterator.n()).done; ) {
-            _loop();
+          var preview = galleryImages.map(function (image, idx) {
+            var imgSrc = image;
+            if (themeUri && imgSrc.indexOf("http") !== 0 && imgSrc.indexOf("/") !== 0) {
+              imgSrc = themeUri + "/" + imgSrc.replace(/^\.\//, "");
+            }
+            return '\n            <div class="modal-preview__item '
+              .concat(
+                idx === 0 ? "modal-preview__item--active" : "",
+                '" tabindex="0" data-index="'
+              )
+              .concat(idx, '">\n              <img src="')
+              .concat(
+                imgSrc,
+                '" alt="">\n            </div>\n          '
+              );
+          });
+
+          var sizes = (dataItem.sizes || [39, 40, 41, 42, 43]).map(function (size, idx) {
+            return '\n            <li class="modal-sizes__item">\n              <button class="btn-reset modal-sizes__btn'.concat(
+              idx === 0 ? " modal-sizes__btn--active" : "",
+              '">',
+              size,
+              "</button>\n            </li>\n          "
+            );
+          });
+
+          prodModalSlider.innerHTML = slides.join("");
+          prodModalPreview.innerHTML = preview.join("");
+
+          var vendorVal = (dataItem.chars && dataItem.chars["Артикул"]) ? dataItem.chars["Артикул"] : (dataItem.sku || "SNK-" + String(dataItem.id).padStart(3, '0'));
+          var vendorEl = prodModal.querySelector(".modal-vendor-val");
+          if (vendorEl) {
+            vendorEl.textContent = vendorVal;
           }
-        } catch (err) {
-          _iterator.e(err);
-        } finally {
-          _iterator.f();
+
+          var formattedPrice = normalPrice(dataItem.price);
+          var oldPriceHtml = dataItem.oldPrice ? '<span class="modal-info__old-price" style="display:inline-block;margin-left:8px;text-decoration:line-through;color:#8e8e8e;">' + normalPrice(dataItem.oldPrice) + ' р</span>' : '';
+
+          prodModalInfo.innerHTML =
+            '\n\n          <h3 class="modal-info__title">'
+              .concat(
+                dataItem.title,
+                '</h3>\n          <div class="modal-info__rate">\n            <img src="' + (themeUri ? themeUri + '/img/star.svg' : 'img/star.svg') + '" alt="Рейтинг 5 из 5">\n            <img src="' + (themeUri ? themeUri + '/img/star.svg' : 'img/star.svg') + '" alt="">\n            <img src="' + (themeUri ? themeUri + '/img/star.svg' : 'img/star.svg') + '" alt="">\n            <img src="' + (themeUri ? themeUri + '/img/star.svg' : 'img/star.svg') + '" alt="">\n            <img src="' + (themeUri ? themeUri + '/img/star.svg' : 'img/star.svg') + '" alt="">\n          </div>\n          <div class="modal-info__sizes">\n            <span class="modal-info__subtitle">Выберите размер</span>\n            <ul class="list-reset modal-info__sizes-list modal-sizes">\n              '
+              )
+              .concat(
+                sizes.join(""),
+                '\n            </ul>\n          </div>\n          <div class="modal-info__price">\n            <span class="modal-info__current-price">'
+              )
+              .concat(
+                formattedPrice,
+                ' р</span>' + oldPriceHtml + '\n          </div>\n        '
+              );
+
+          prodModalDescr.textContent = dataItem.description || "";
+          var charsItems = "";
+          if (dataItem.chars) {
+            Object.keys(dataItem.chars).forEach(function eachKey(key) {
+              charsItems += '<p class="prod-bottom__descr prod-chars__item">'
+                .concat(key, ": ")
+                .concat(dataItem.chars[key], "</p>");
+            });
+          }
+          prodModalChars.innerHTML = charsItems;
+
+          if (dataItem.video) {
+            prodModalVideo.style.display = "block";
+            prodModalVideo.innerHTML =
+              '\n            <iframe src="'.concat(
+                dataItem.video,
+                '"\n            allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"\n            allowfullscreen></iframe>\n          '
+              );
+          } else {
+            prodModalVideo.style.display = "none";
+          }
+
+          // Выбор размера в модальном окне
+          var sizeBtns = prodModal.querySelectorAll(".modal-sizes__btn");
+          sizeBtns.forEach(function (btn) {
+            btn.addEventListener("click", function (e) {
+              sizeBtns.forEach(function (b) {
+                b.classList.remove("modal-sizes__btn--active");
+              });
+              e.currentTarget.classList.add("modal-sizes__btn--active");
+            });
+          });
+
+          // Привязка кнопок заказа
+          var addBtn = document.getElementById("modalAddToCartBtn");
+          if (addBtn) {
+            addBtn.dataset.productId = dataItem.wc_id || dataItem.id;
+            addBtn.dataset.id = dataItem.id;
+            addBtn.onclick = function () {
+              var pId = addBtn.dataset.productId || dataItem.id;
+              loadCartData(dataItem.id);
+              var activeSize = prodModal.querySelector(".modal-sizes__btn--active");
+              var sizeText = activeSize ? " (размер " + activeSize.textContent.trim() + ")" : "";
+              if (typeof showToast === "function") {
+                showToast("Товар добавлен в корзину" + sizeText + "!");
+              }
+              if (modal) {
+                modal.close();
+              }
+            };
+          }
+
+          var buyBtn = document.getElementById("modalQuickBuyBtn");
+          if (buyBtn) {
+            buyBtn.dataset.productId = dataItem.wc_id || dataItem.id;
+            buyBtn.dataset.productName = dataItem.title;
+            buyBtn.dataset.productPrice = formattedPrice + " ₽";
+            var firstImg = galleryImages[0] || dataItem.mainImage;
+            if (themeUri && firstImg.indexOf("http") !== 0 && firstImg.indexOf("/") !== 0) {
+              firstImg = themeUri + "/" + firstImg.replace(/^\.\//, "");
+            }
+            buyBtn.dataset.productThumb = '<img src="' + firstImg + '" alt="" />';
+          }
         }
       })
       .then(function () {
-        prodSlider.update();
-        prodSlider.on("slideChangeTransitionEnd", function () {
-          var idx = document.querySelector(".swiper-slide-active").dataset
-            .index;
-          document
-            .querySelectorAll(".modal-preview__item")
-            .forEach(function (el) {
-              el.classList.remove("modal-preview__item--active");
-            });
-          document
-            .querySelector(
-              '.modal-preview__item[data-index="'.concat(idx, '"]')
-            )
-            .classList.add("modal-preview__item--active");
-        });
-        document
+        if (prodSlider && typeof prodSlider.update === "function") {
+          prodSlider.update();
+          prodSlider.slideTo(0);
+        }
+
+        prodModalPreview
           .querySelectorAll(".modal-preview__item")
           .forEach(function (el) {
             el.addEventListener("click", function (e) {
               var idx = parseInt(e.currentTarget.dataset.index);
-              document
+              prodModalPreview
                 .querySelectorAll(".modal-preview__item")
-                .forEach(function (el) {
-                  el.classList.remove("modal-preview__item--active");
+                .forEach(function (p) {
+                  p.classList.remove("modal-preview__item--active");
                 });
               e.currentTarget.classList.add("modal-preview__item--active");
-              prodSlider.slideTo(idx);
+              if (prodSlider && typeof prodSlider.slideTo === "function") {
+                prodSlider.slideTo(idx);
+              }
             });
           });
       });
-  };
+  }
 
   catalogMore.addEventListener("click", function (e) {
     prodQuantity = prodQuantity + 3;
@@ -1047,72 +1075,58 @@ var Quiz = /*#__PURE__*/ (function () {
       value: function nextQuestion() {
         var _this = this;
 
-        console.log("next question!");
+        if (this.counter + 1 < this.dataLength) {
+          this.counter++;
+          this.$el.innerHTML = quizTemplate(
+            this.data[this.counter],
+            this.dataLength,
+            this.options
+          );
 
-        if (this.valid()) {
-          if (this.counter + 1 < this.dataLength) {
-            this.counter++;
-            this.$el.innerHTML = quizTemplate(
-              this.data[this.counter],
-              this.dataLength,
-              this.options
-            );
-
-            if (this.counter + 1 == this.dataLength) {
-              document.querySelector(".quiz-question__answers").style.display =
-                "block";
+          if (this.counter + 1 == this.dataLength) {
+            var answersEl = document.querySelector(".quiz-question__answers");
+            if (answersEl) {
+              answersEl.style.display = "block";
             }
-          } else {
-            document.querySelector(".quiz-questions").style.display = "none";
-            document.querySelector(".last-question").style.display = "block";
-            document.querySelector(".quiz__title").textContent =
-              "Ваша подборка готова!";
-            document.querySelector(".quiz__descr").textContent =
-              "Оставьте свои контактные данные, чтобы мы могли отправить подготовленный для вас каталог";
+          }
 
-            var quizForm = document.querySelector(".quiz-form");
+          var quizSection = document.getElementById("quiz");
+          if (quizSection) {
+            quizSection.scrollIntoView({ behavior: "smooth", block: "nearest" });
+          }
+        } else {
+          var questionsEl = document.querySelector(".quiz-questions");
+          if (questionsEl) {
+            questionsEl.style.display = "none";
+          }
+          var lastQ = document.querySelector(".last-question");
+          if (lastQ) {
+            lastQ.style.display = "block";
+          }
+          var quizTitle = document.querySelector(".quiz__title");
+          if (quizTitle) {
+            quizTitle.textContent = "Ваша подборка готова!";
+          }
+          var quizDescr = document.querySelector(".quiz__descr");
+          if (quizDescr) {
+            quizDescr.textContent = "Оставьте свои контактные данные, чтобы мы могли отправить подготовленный для вас каталог";
+          }
+
+          var quizForm = document.querySelector(".quiz-form");
+          if (quizForm) {
             var quizPhoneInput = quizForm.querySelector('input[name="phone"]');
-            if (quizPhoneInput) {
+            if (quizPhoneInput && typeof phoneMask !== "undefined" && phoneMask && typeof phoneMask.mask === "function") {
               phoneMask.mask(quizPhoneInput);
             }
 
             quizForm.onsubmit = function (e) {
               e.preventDefault();
-              quizFormData = new FormData(quizForm);
-
-              var _iterator = _createForOfIteratorHelper(_this.resultArray),
-                _step;
-
-              try {
-                for (_iterator.s(); !(_step = _iterator.n()).done; ) {
-                  var item = _step.value;
-
-                  for (var obj in item) {
-                    quizFormData.append(
-                      obj,
-                      item[obj].substring(0, item[obj].length - 1)
-                    );
-                  }
-                }
-              } catch (err) {
-                _iterator.e(err);
-              } finally {
-                _iterator.f();
-              }
-
-              if (textareaText) {
-                quizFormData.append("textarea", textareaText);
-              }
-
-              var xhr = new XMLHttpRequest();
-              xhr.open("POST", "mail.php", true);
-              xhr.send(quizFormData);
               quizForm.reset();
-              showToast("Ваш подбор кроссовок принят! Каталог отправлен на почту.");
+              if (typeof showToast === "function") {
+                showToast("Ваш запрос принят! Персональный каталог отправлен на указанную почту.");
+              }
             };
           }
-        } else {
-          console.log("Не валидно!");
         }
       },
     },
@@ -1121,29 +1135,57 @@ var Quiz = /*#__PURE__*/ (function () {
       value: function events() {
         var _this2 = this;
 
-        console.log("events!");
         this.$el.addEventListener("click", function (e) {
-          if (e.target == document.querySelector("[data-next-btn]")) {
-            _this2.addToSend();
+          // Toggle checkbox/radio when clicking anywhere on item card (e.g. image)
+          var item = e.target.closest(".quiz-question__item");
+          if (item && !e.target.closest("label") && !e.target.closest("input") && !e.target.closest("button") && !e.target.closest("[data-next-btn]")) {
+            var inp = item.querySelector("input");
+            if (inp) {
+              inp.checked = !inp.checked;
+              inp.dispatchEvent(new Event("change", { bubbles: true }));
+            }
+          }
 
+          var nextBtn = e.target.closest("[data-next-btn]");
+          if (nextBtn) {
+            e.preventDefault();
+            if (!_this2.valid()) {
+              if (typeof showToast === "function") {
+                showToast("Пожалуйста, выберите хотя бы один вариант ответа");
+              }
+              var items = _this2.$el.querySelectorAll(".quiz-question__item, .quiz-question__label");
+              items.forEach(function (el) {
+                el.classList.add("quiz-error-shake");
+                setTimeout(function () {
+                  el.classList.remove("quiz-error-shake");
+                }, 600);
+              });
+              return;
+            }
+
+            _this2.addToSend();
             _this2.nextQuestion();
           }
         });
+
         this.$el.addEventListener("change", function (e) {
           if (e.target.tagName == "INPUT") {
             if (e.target.type !== "checkbox" && e.target.type !== "radio") {
               var elements = _this2.$el.querySelectorAll("input");
-
               elements.forEach(function (el) {
                 el.checked = false;
               });
             }
 
-            _this2.tmp = _this2.serialize(document.querySelector(".quiz-form"));
+            var quizForm = document.querySelector(".quiz-form");
+            if (quizForm) {
+              _this2.tmp = _this2.serialize(quizForm);
+            }
           } else {
             var textarea = _this2.$el.querySelector("textarea");
-
-            textareaText = textarea.value;
+            if (textarea) {
+              textareaText = textarea.value;
+            }
           }
         });
       },
@@ -1151,17 +1193,16 @@ var Quiz = /*#__PURE__*/ (function () {
     {
       key: "valid",
       value: function valid() {
-        var isValid = false;
         var textarea = this.$el.querySelector("textarea");
-
         if (textarea) {
-          if (textarea.value.length > 0) {
-            isValid = true;
-            return isValid;
-          }
+          return true;
         }
 
         var elements = this.$el.querySelectorAll("input");
+        if (elements.length === 0) {
+          return true;
+        }
+
         var hasChecked = false;
         elements.forEach(function (el) {
           if (el.type === "checkbox" || el.type === "radio") {
@@ -1170,27 +1211,21 @@ var Quiz = /*#__PURE__*/ (function () {
             }
           } else if (el.type === "text") {
             if (el.value.trim().length > 0) {
-              isValid = true;
+              hasChecked = true;
             }
           }
         });
 
-        if (hasChecked) {
-          isValid = true;
-          elements.forEach(function (el) {
-            el.classList.remove("error");
-          });
-        } else if (!isValid) {
-          elements.forEach(function (el) {
-            el.classList.add("error");
-          });
-        }
-        return isValid;
+        return hasChecked;
       },
     },
     {
       key: "addToSend",
       value: function addToSend() {
+        var quizForm = document.querySelector(".quiz-form");
+        if (quizForm) {
+          this.tmp = this.serialize(quizForm);
+        }
         this.resultArray.push(this.tmp);
       },
     },

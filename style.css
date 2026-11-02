@@ -4,7 +4,7 @@ Theme URI: https://github.com/Lelyaler/sneakmax-woocommerce
 Author: Elena Cherniavskaia
 Author URI: https://github.com/Lelyaler
 Description: Премиальная тема интернет-магазина оригинальных брендовых кроссовок с поддержкой WooCommerce, AJAX-каталогом, интерактивным квизом и быстрым оформлением заказов в 1 клик.
-Version: 1.0.2
+Version: 1.0.3
 Requires at least: 6.0
 Tested up to: 6.6
 Requires PHP: 7.4
@@ -372,4 +372,50 @@ body:not(.home) .main > .container {
 .wc-block-components-checkout-place-order-button:hover,
 .wc-block-cart__submit-button:hover {
   background-color: var(--color-accent-hover, #ba2424) !important;
+}
+
+/* Interactive Quiz Enhancements */
+.quiz-question__item {
+  cursor: pointer;
+  user-select: none;
+  transition: transform 0.2s ease;
+}
+
+.quiz-question__item img {
+  cursor: pointer;
+  transition: transform 0.25s ease, box-shadow 0.25s ease, border-color 0.25s ease !important;
+  border: 2px solid transparent;
+}
+
+.quiz-question__item:hover img {
+  transform: translateY(-3px);
+  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.1) !important;
+}
+
+.quiz-question__item:has(input:checked) img {
+  border-color: var(--color-accent, #f14f4f) !important;
+  box-shadow: 0 8px 24px rgba(241, 79, 79, 0.25) !important;
+}
+
+.quiz-question__item--no-img {
+  padding: 12px 16px;
+  background: #ffffff;
+  border-radius: 8px;
+  border: 1px solid #e5e7eb;
+  transition: all 0.2s ease;
+}
+
+.quiz-question__item--no-img:has(input:checked) {
+  border-color: var(--color-accent, #f14f4f);
+  background: rgba(241, 79, 79, 0.04);
+}
+
+@keyframes quizShake {
+  0%, 100% { transform: translateX(0); }
+  20%, 60% { transform: translateX(-6px); }
+  40%, 80% { transform: translateX(6px); }
+}
+
+.quiz-error-shake {
+  animation: quizShake 0.5s ease;
 }

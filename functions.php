@@ -9,7 +9,7 @@ if ( ! defined( 'ABSPATH' ) ) {
 	exit;
 }
 
-define( 'SNEAKMAX_VERSION', '1.0.2' );
+define( 'SNEAKMAX_VERSION', '1.0.3' );
 
 /**
  * Theme setup

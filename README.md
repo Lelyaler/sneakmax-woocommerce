@@ -1,5 +1,8 @@
 # Sneakmax — WooCommerce Theme
 
+- **Демонстрация интерфейса (Live Demo):** [lelyaler.github.io/Sneakmax/](https://lelyaler.github.io/Sneakmax/)
+- **Репозиторий фронтенда:** [github.com/Lelyaler/Sneakmax](https://github.com/Lelyaler/Sneakmax)
+
 Кастомная тема интернет-магазина брендовых кроссовок для WordPress и WooCommerce. Превращает статическую верстку Sneakmax в динамический интернет-магазин с поддержкой каталога товаров, фильтрации по цене и параметрам, модального окна быстрого просмотра и интеграцией с корзиной.
 
 ## Особенности темы
